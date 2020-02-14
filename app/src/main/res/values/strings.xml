@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Random Choices</string>
+
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="who_knows">\?</string>
+    <string name="a_fruit">a_fruit</string>
+    <string name="fruit">fruit</string>
+    <string name="veg">veg</string>
+    <string name="response_text_string">response_text_string</string>
+    <string name="acknowledge_button_text">OK</string>
+    <string name="lunch">lunch</string>
+</resources>
