@@ -54,4 +54,8 @@ public class Category {
     public String getRandom(Random generator){
         return options.get(generator.nextInt(options.size()));
     }
+
+    public void delete(){
+        buttons.setVisibility(View.GONE);
+    }
 }

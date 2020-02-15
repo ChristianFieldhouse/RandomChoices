@@ -122,6 +122,12 @@ public class FullscreenActivity extends AppCompatActivity {
         saveCategory(categories.get(category_list.indexOf(options_category)), context);
     }
 
+    private void deleteCategory(){
+        categories.get(category_list.indexOf(options_category)).delete();
+        categories.remove(category_list.indexOf(options_category));
+        category_list.remove(options_category);
+    }
+
     private void saveAllCategories(Context context) {
         for (Category category : categories) {
             saveCategory(category, context);
@@ -214,6 +220,14 @@ public class FullscreenActivity extends AppCompatActivity {
         save_options_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 saveOptions(context);
+                showChoices();
+            }
+        });
+
+        final Button delete_category_button = findViewById(R.id.delete_category_button);
+        delete_category_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                deleteCategory();
                 showChoices();
             }
         });
