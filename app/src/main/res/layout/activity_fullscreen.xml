@@ -98,7 +98,7 @@
             tools:ignore="UselessParent">
 
             <TextView
-                android:id="@+id/option_added_text"
+                android:id="@+id/display_current_options"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.1"
@@ -106,9 +106,9 @@
                 android:keepScreenOn="true"
                 android:text="@string/thing_added_confirmation"
                 android:textColor="#33b5e5"
-                android:textSize="50sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:padding="100dp"/>
+                android:padding="10dp"/>
 
             <EditText
                 android:id="@+id/add_option_text_input"
@@ -158,14 +158,14 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:inputType="text"/>
-            <Button
-                android:id="@+id/save_categories_button"
-                style="?metaButtonBarButtonStyle"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:text="@string/save_button_string"/>
-
         </LinearLayout>
+        <Button
+            android:id="@+id/save_categories_button"
+            style="?metaButtonBarButtonStyle"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="@string/save_button_string"/>
     </FrameLayout>
 
 </FrameLayout>

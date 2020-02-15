@@ -55,6 +55,14 @@ public class Category {
         return options.get(generator.nextInt(options.size()));
     }
 
+    public String getAllOptions(){
+        String r = "";
+        for(String option: options){
+            r += option + "\n";
+        }
+        return r;
+    }
+
     public void delete(){
         buttons.setVisibility(View.GONE);
     }

@@ -113,9 +113,13 @@ public class FullscreenActivity extends AppCompatActivity {
     private void setResponse(String category_name){
         mResponseText.setText(categories.get(category_list.indexOf(category_name)).getRandom(generator));
     }
+    private void refreshOptionDisplay(){
+        mOptionDisplay.setText(categories.get(category_list.indexOf(options_category)).getAllOptions());
+    }
 
     private void addOption(String option){
         categories.get(category_list.indexOf(options_category)).options.add(option);
+        refreshOptionDisplay();
     }
 
     private void saveOptions(Context context){
@@ -142,6 +146,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private String options_category;
     private TextView mResponseText;
+    private TextView mOptionDisplay;
     private Random generator;
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
@@ -179,6 +184,7 @@ public class FullscreenActivity extends AppCompatActivity {
         mAddCategoryFrame = findViewById(R.id.category_options_frame);
 
         mResponseText = findViewById(R.id.response_text);
+        mOptionDisplay = findViewById(R.id.display_current_options);
 
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(
@@ -336,6 +342,7 @@ public class FullscreenActivity extends AppCompatActivity {
         options_category = category;
         mChoiceFrame.setVisibility(View.GONE);
         mOptionsFrame.setVisibility(View.VISIBLE);
+        refreshOptionDisplay();
     }
 
     protected void showAddCategoryFrame(){
