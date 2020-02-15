@@ -1,18 +1,22 @@
 package com.example.randomchoices;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Random;
 
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -44,6 +48,7 @@ public class FullscreenActivity extends AppCompatActivity {
             "Grapefruits",
             "Tangerines"
     ));
+
     private ArrayList<String> veg_array = new ArrayList<>(Arrays.asList(
             "Cucumbers",
             "Bell Peppers",
@@ -61,92 +66,110 @@ public class FullscreenActivity extends AppCompatActivity {
             "Asparagus",
             "Green Beans"
     ));
-    private ArrayList<String> protein_array = new ArrayList<>(Arrays.asList(
-            "Pork",
-            "Chicken",
-            "Beef",
-            "Lamb",
-            "Fish",
-            "Eggs"
-    ));
-    private ArrayList<String> lunch_array = new ArrayList<>(Arrays.asList(
-            "Gourmet House",
-            "Nivedyam",
-            "Chinese Canteen",
-            "HK Fusion",
-            "Market",
-            "Tortilla"
-    ));
 
-    private ArrayList<String> categories = new ArrayList<>(Arrays.asList(
-            "fruit",
-            "veg",
-            "protein",
-            "lunch"
-    ));
+    private ArrayList<Category> categories;
+    private ArrayList<String> category_list;
 
-    // default options
-    private ArrayList<ArrayList<String>> data = new ArrayList<>(Arrays.asList(
-            fruit_array,
-            veg_array,
-            protein_array,
-            lunch_array
-    ));
-
-    public boolean saveArray(String[] array, String arrayName, Context mContext) {
+    public boolean saveCategory(Category category, Context mContext) {
         SharedPreferences prefs = mContext.getSharedPreferences(
                 getString(R.string.preference_file_key),  Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(arrayName +"_size", array.length);
-        for(int i=0;i<array.length;i++)
-            editor.putString(arrayName + "_" + i, array[i]);
+        editor.putInt(category.name +"_size", category.options.size());
+        for(int i = 0; i < category.options.size(); i++)
+            editor.putString(category.name + "_" + i, category.options.get(i));
         return editor.commit();
     }
-    public String[] loadArray(String arrayName, Context mContext) {
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public Category loadCategory(String category_name, Context mContext) {
         SharedPreferences prefs = mContext.getSharedPreferences(
                 getString(R.string.preference_file_key),  Context.MODE_PRIVATE);
-        int size = prefs.getInt(arrayName + "_size", 0);
-        String array[] = new String[size];
-        for(int i=0;i<size;i++)
-            array[i] = prefs.getString(arrayName + "_" + i, null);
-        return array;
+        int size = prefs.getInt(category_name + "_size", 0);
+        ArrayList<String> options = new ArrayList<String>(0);
+        for(int i = 0; i < size; i++)
+            options.add(prefs.getString(category_name + "_" + i, null));
+        return new Category(category_name, options, mContext);
     }
 
-    private void setResponse(String category){
-        int index = categories.indexOf(category);
-        mResponseText.setText(data.get(index).get(generator.nextInt(data.get(index).size())));
+    public boolean saveCategoryList(ArrayList<String> list, Context mContext) {
+        SharedPreferences prefs = mContext.getSharedPreferences(
+                getString(R.string.preference_file_key),  Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("category_count", list.size());
+        for(int i = 0; i < list.size(); i++)
+            editor.putString("category_" + i, list.get(i));
+        return editor.commit();
+    }
+    public ArrayList<String> loadCategoryList(Context mContext) {
+        SharedPreferences prefs = mContext.getSharedPreferences(
+                getString(R.string.preference_file_key),  Context.MODE_PRIVATE);
+        int size = prefs.getInt("category_count", 0);
+        ArrayList<String> category_list = new ArrayList<String>(size);
+        for(int i = 0; i < size; i++)
+            category_list.add(prefs.getString("category_" + i, null));
+        return category_list;
+    }
+
+
+    private void setResponse(String category_name){
+        mResponseText.setText(categories.get(category_list.indexOf(category_name)).getRandom(generator));
+    }
+
+    private void addOption(String option){
+        categories.get(category_list.indexOf(options_category)).options.add(option);
+    }
+
+    private void saveOptions(Context context){
+        saveCategory(categories.get(category_list.indexOf(options_category)), context);
+    }
+
+    private void saveAllCategories(Context context) {
+        for (Category category : categories) {
+            saveCategory(category, context);
+        }
+        saveCategoryList(category_list, context);
     }
 
     private View mResponseFrame;
     private View mChoiceFrame;
     private View mOptionsFrame;
+    private View mAddCategoryFrame;
+
     private String options_category;
     private TextView mResponseText;
     private Random generator;
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen);
         final Context context = getApplicationContext();
 
-        ArrayList<String> saved_categories = new ArrayList<>(Arrays.asList(loadArray("categories", context)));
+        ArrayList<String> saved_categories = loadCategoryList(context);
         if (saved_categories.size() > 0){
-            categories = saved_categories;
-            data = new ArrayList<>(categories.size());
-        }
-
-        for (String category: categories){
-            ArrayList<String> saved_list =  new ArrayList<>(Arrays.asList(loadArray(category, context)));
-            if(saved_list.size() > 0){
-                data.set(categories.indexOf(category), saved_list);
+            category_list = saved_categories;
+            categories = new ArrayList<>(0);
+            for(int i = 0; i < saved_categories.size(); i++){
+                categories.add(loadCategory(category_list.get(i), context));
             }
         }
+        else{
+            category_list = new ArrayList<String>(Arrays.asList(
+                    "fruit",
+                    "veg"
+                    ));
+            categories = new ArrayList<>(0);
+            categories.add(new Category("fruit", fruit_array, context));
+            categories.add(new Category("veg", veg_array, context));
+        }
+        addCategoriesToLayout();
 
         generator = new Random();
 
-        mChoiceFrame = findViewById(R.id.product_choice_frame);
+        mChoiceFrame = findViewById(R.id.category_choice_frame);
         mResponseFrame = findViewById(R.id.response_frame);
         mOptionsFrame = findViewById(R.id.options_frame);
+        mAddCategoryFrame = findViewById(R.id.category_options_frame);
+
         mResponseText = findViewById(R.id.response_text);
 
         View decorView = getWindow().getDecorView();
@@ -161,34 +184,10 @@ public class FullscreenActivity extends AppCompatActivity {
 
         mChoiceFrame.setVisibility(View.VISIBLE);
 
-        final Button fruit_button = findViewById(R.id.fruit_button);
-        fruit_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setResponse("fruit");
-                showResponse();
-            }
-        });
-        final Button veg_button = findViewById(R.id.veg_button);
-        veg_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setResponse("veg");
-                showResponse();
-            }
-        });
-        final Button lunch_button = findViewById(R.id.lunch_button);
-        lunch_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setResponse("lunch");
-                showResponse();
-            }
-        });
-        final Button protein_button = findViewById(R.id.protein_button);
-        protein_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setResponse("protein");
-                showResponse();
-            }
-        });
+        for(Category category: categories){
+            makeCategoryResponseButtonWork(category);
+            makeCategoryOptionButtonWork(category);
+        }
 
         final Button acknowledge_button = findViewById(R.id.acknowledge_button);
         acknowledge_button.setOnClickListener(new View.OnClickListener() {
@@ -197,26 +196,16 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
-        final Button fruit_options_button = findViewById(R.id.fruit_options);
-        fruit_options_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                showOptions("fruit");
-            }
-        });
-
-        final EditText add_option_text_input = (EditText) findViewById(R.id.add_option_text_input);
+        final EditText add_option_text_input = findViewById(R.id.add_option_text_input);
         add_option_text_input.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // If the event is a key-down event on the "enter" button
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    // Perform action on key press
-
-                    data.get(categories.indexOf(options_category)).add(add_option_text_input.getText().toString());
-                    saveArray(data.get(categories.indexOf(options_category)).toArray(new String[0]), options_category, context);
+                    addOption(add_option_text_input.getText().toString());
+                    add_option_text_input.getText().clear();
                     return true;
                 }
-
                 return false;
             }
         });
@@ -224,6 +213,43 @@ public class FullscreenActivity extends AppCompatActivity {
         final Button save_options_button = findViewById(R.id.save_options_button);
         save_options_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                saveOptions(context);
+                showChoices();
+            }
+        });
+
+        final Button add_category_button = findViewById(R.id.add_category_button);
+        add_category_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showAddCategoryFrame();
+            }
+        });
+
+        final EditText add_category_text_input = findViewById(R.id.add_category_text_input);
+        add_category_text_input.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    String input = add_category_text_input.getText().toString();
+                    categories.add(new Category(input, context));
+                    category_list.add(input);
+                    add_category_text_input.getText().clear();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        final Button save_categories_button = findViewById(R.id.save_categories_button);
+        save_categories_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                saveAllCategories(context);
+                addCategoriesToLayout();
+                for (Category category: categories){
+                    makeCategoryResponseButtonWork(category);
+                    makeCategoryOptionButtonWork(category);
+                }
                 showChoices();
             }
         });
@@ -236,6 +262,34 @@ public class FullscreenActivity extends AppCompatActivity {
         });
     }
 
+    private void makeCategoryResponseButtonWork(Category category) {
+        final String category_name = category.name;
+        category.category_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setResponse(category_name);
+                showResponse();
+            }
+        });
+    }
+
+    private void makeCategoryOptionButtonWork(Category category) {
+        final String category_name = category.name; // name shouldn't change
+        category.options_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showOptions(category_name);
+            }
+        });
+    }
+
+    private void addCategoriesToLayout(){
+        LinearLayout buttons_layout = findViewById(R.id.category_choice_linear_layout);
+        for (Category category: categories){
+            if(findViewById(category.layout_id) == null){
+                buttons_layout.addView(category.buttons, 0);
+            }
+        }
+    }
+
     protected void showResponse(){
         mResponseFrame.setVisibility(View.VISIBLE);
         mChoiceFrame.setVisibility(View.GONE);
@@ -245,6 +299,7 @@ public class FullscreenActivity extends AppCompatActivity {
     protected void showChoices(){
         mOptionsFrame.setVisibility(View.GONE);
         mResponseFrame.setVisibility(View.GONE);
+        mAddCategoryFrame.setVisibility(View.GONE);
         mChoiceFrame.setVisibility(View.VISIBLE);
     }
 
@@ -252,6 +307,11 @@ public class FullscreenActivity extends AppCompatActivity {
         options_category = category;
         mChoiceFrame.setVisibility(View.GONE);
         mOptionsFrame.setVisibility(View.VISIBLE);
+    }
+
+    protected void showAddCategoryFrame(){
+        mChoiceFrame.setVisibility(View.GONE);
+        mAddCategoryFrame.setVisibility(View.VISIBLE);
     }
 
     @Override
