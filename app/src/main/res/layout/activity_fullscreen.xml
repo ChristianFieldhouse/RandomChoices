@@ -88,13 +88,25 @@
             android:orientation="vertical"
             tools:ignore="UselessParent">
 
-            <Button
-                android:id="@+id/fruit_button"
-                style="?metaButtonBarButtonStyle"
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/fruit"/>
+                >
+                <Button
+                    android:id="@+id/fruit_button"
+                    style="?metaButtonBarButtonStyle"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/fruit"/>
+                <Button
+                    android:id="@+id/fruit_options"
+                    style="?metaButtonBarButtonStyle"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:text="@string/settings_string"/>
+            </LinearLayout>
             <Button
                 android:id="@+id/veg_button"
                 style="?metaButtonBarButtonStyle"
@@ -116,6 +128,37 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/lunch"/>
+        </LinearLayout>
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:visibility="gone"
+        android:id="@+id/options_frame">
+        <LinearLayout
+            style="?metaButtonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/black_overlay"
+            android:orientation="vertical"
+            tools:ignore="UselessParent">
+
+            <EditText
+                android:id="@+id/add_option_text_input"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:inputType="text"/>
+            <Button
+                android:id="@+id/save_options_button"
+                style="?metaButtonBarButtonStyle"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="@string/save_button_string"/>
+
         </LinearLayout>
     </FrameLayout>
 
