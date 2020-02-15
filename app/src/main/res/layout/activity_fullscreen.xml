@@ -87,7 +87,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        android:visibility="visible"
+        android:visibility="gone"
         android:id="@+id/options_frame">
         <LinearLayout
             style="?metaButtonBarStyle"
@@ -148,7 +148,7 @@
             style="?metaButtonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
+            android:layout_gravity="center|center_horizontal"
             android:background="@color/black_overlay"
             android:orientation="vertical"
             tools:ignore="UselessParent">

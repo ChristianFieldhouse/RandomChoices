@@ -161,11 +161,13 @@ public class FullscreenActivity extends AppCompatActivity {
         else{
             category_list = new ArrayList<String>(Arrays.asList(
                     "fruit",
-                    "veg"
+                    "veg",
+                    "yes / no"
                     ));
             categories = new ArrayList<>(0);
             categories.add(new Category("fruit", fruit_array, context));
             categories.add(new Category("veg", veg_array, context));
+            categories.add(new Category("yes / no", new ArrayList<>(Arrays.asList("Yes", "No")), context));
         }
         addCategoriesToLayout();
 
@@ -228,6 +230,7 @@ public class FullscreenActivity extends AppCompatActivity {
         delete_category_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 deleteCategory();
+                saveCategoryList(category_list, context);
                 showChoices();
             }
         });
@@ -274,6 +277,18 @@ public class FullscreenActivity extends AppCompatActivity {
             public void onClick(View view) {
             }
         });
+    }
+
+    protected void onResume(){
+        super.onResume();
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
 
     private void makeCategoryResponseButtonWork(Category category) {
