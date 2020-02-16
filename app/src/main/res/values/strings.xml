@@ -16,4 +16,5 @@
     <string name="add_category_button_string">+</string>
     <string name="thing_added_confirmation">+</string>
     <string name="delete_button_string">delete category</string>
+    <string name="another_button_string">+</string>
 </resources>

@@ -16,12 +16,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Random;
-
-import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
-import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-import static android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -111,25 +106,26 @@ public class FullscreenActivity extends AppCompatActivity {
 
 
     private void setResponse(String category_name){
+        current_category = category_name;
         mResponseText.setText(categories.get(category_list.indexOf(category_name)).getRandom(generator));
     }
     private void refreshOptionDisplay(){
-        mOptionDisplay.setText(categories.get(category_list.indexOf(options_category)).getAllOptions());
+        mOptionDisplay.setText(categories.get(category_list.indexOf(current_category)).getAllOptions());
     }
 
     private void addOption(String option){
-        categories.get(category_list.indexOf(options_category)).options.add(option);
+        categories.get(category_list.indexOf(current_category)).options.add(option);
         refreshOptionDisplay();
     }
 
     private void saveOptions(Context context){
-        saveCategory(categories.get(category_list.indexOf(options_category)), context);
+        saveCategory(categories.get(category_list.indexOf(current_category)), context);
     }
 
     private void deleteCategory(){
-        categories.get(category_list.indexOf(options_category)).delete();
-        categories.remove(category_list.indexOf(options_category));
-        category_list.remove(options_category);
+        categories.get(category_list.indexOf(current_category)).delete();
+        categories.remove(category_list.indexOf(current_category));
+        category_list.remove(current_category);
     }
 
     private void saveAllCategories(Context context) {
@@ -144,7 +140,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private View mOptionsFrame;
     private View mAddCategoryFrame;
 
-    private String options_category;
+    private String current_category;
     private TextView mResponseText;
     private TextView mOptionDisplay;
     private Random generator;
@@ -207,6 +203,14 @@ public class FullscreenActivity extends AppCompatActivity {
         acknowledge_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showChoices();
+            }
+        });
+
+        final Button another_button = findViewById(R.id.another_button);
+        another_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setResponse(current_category);
+                showResponse();
             }
         });
 
@@ -339,7 +343,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     protected void showOptions(String category){
-        options_category = category;
+        current_category = category;
         mChoiceFrame.setVisibility(View.GONE);
         mOptionsFrame.setVisibility(View.VISIBLE);
         refreshOptionDisplay();
